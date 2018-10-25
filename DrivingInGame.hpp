@@ -23,19 +23,16 @@ public:
 	DrivingInGame(void){}
 	virtual ~DrivingInGame(void){}
 	float Start(void);
-	void SetDefaultYPos(int yPos) {defaultYPos = yPos;}
 
 private:
-	static const unsigned int MAX_OBSTACLE_COUNT = 3;
+	static const unsigned int MAX_OBSTACLE_COUNT = 4;
 	static const unsigned int REFRESH_PERIOD = 20;
-
-	int defaultYPos;
 
 	void updateObstaclePosition(unsigned int currentTime);
 	void updateDrDriverPosition(void);
 	bool isCollision(void);
 	void refreshLcd(void);
-	void generateObstacle(void);
+	void generateObstacle(float score);
 	void deleteRoadObject(unsigned int i);
 
 	roadObject *pRoadObject[MAX_OBSTACLE_COUNT];

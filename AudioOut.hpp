@@ -8,6 +8,17 @@
 #ifndef AUDIOOUT_HPP_
 #define AUDIOOUT_HPP_
 
+
+
+
+
+#define C3 130.81
+#define D3 146.83
+#define E3 164.81
+#define F3 174.61
+#define G3 196.00
+#define A3 220
+#define B3 246.94
 #define C4 261.626
 #define D4 293.665
 #define E4 329.668
@@ -15,6 +26,13 @@
 #define G4 391.995
 #define A4 440
 #define B4 493.883
+#define C5 523.25
+#define D5 587.33
+#define E5 659.25
+#define F5 698.46
+#define G5 783.99
+#define A5 880
+#define B5 932.33
 
 enum{
 	PLAY_ONCE,

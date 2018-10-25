@@ -7,7 +7,7 @@
 
 #include "drDriver.hpp"
 
-drDriver::drDriver(): roadCar(2, 3, 0)
+drDriver::drDriver(): roadCar(2, 7, 0)
 {
 	// TODO Auto-generated constructor stub
 	hPosition = DR_DRIVER_HPOSITION;

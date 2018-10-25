@@ -63,7 +63,7 @@ void hal_ADXL345::SetSingleTapInterrupt(bool enable, bool isPinInt2)
 	unsigned char value = (unsigned char) readReg(0x2E);
 	if (enable == true)
 	{
-		writeReg(0x1D, 0x50);  // 3g threshold
+		writeReg(0x1D, 0x30);  // 3g threshold
 		writeReg(0x21, 15); //26 ms duration
 		writeReg(0x22, 80); //26 ms latency
 		//writeReg(0x23, 200); //26 ms window

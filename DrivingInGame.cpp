@@ -9,26 +9,25 @@
 #include "DrivingInGame.hpp"
 #include "roadObject.hpp"
 #include "halADXL345.hpp"
+#include "halAccelerometerCtrl.hpp"
 #include "TextLCD.h"
 #include <string.h>
 #include <cstdlib>
 
 extern TextLCD lcd;
 extern Timer gameTimer;
-extern Serial pc;
-extern DigitalIn steer;
+//extern Serial pc;
+extern DigitalOut lcdBacklit;
 
 float DrivingInGame::Start(void)
 {
-	hal_ADXL345* acce = hal_ADXL345::GetInstance();
-
 	gameTimer.reset();
 	gameTimer.start();
 
 	pRoadObject[0] = new obstacle(0, 0);
 	pRoadObject[1] = new roadCar(3, 1, 0);
-	//pRoadObject[1] = new obstacle(2, 0);
-	pRoadObject[2] = 0;
+	for (int i = 2; i<MAX_OBSTACLE_COUNT; i++)
+		pRoadObject[i] = 0;
 	Hayato = new drDriver();
 	srand(gameTimer.read_ms());
 
@@ -56,7 +55,7 @@ float DrivingInGame::Start(void)
 		//
 		// Randomly generate obstacle
 		//
-		generateObstacle();
+		generateObstacle(score);
 
 		//
 		// Refresh LCD display
@@ -72,21 +71,21 @@ float DrivingInGame::Start(void)
 		steerDownsampleCt++;
 		if (steerDownsampleCt == 12)
 		{
-			int16_t data[3];
 			steerDownsampleCt = 0;
-			acce->ReadXYZ(data);
-			int adj = 0;
-			if (data[1] > 50+defaultYPos)
-				adj = 1;
-			else if (data[1] < -50+defaultYPos)
-				adj = -1;
-			pc.printf("x: (%+4d), y: (%+4d), z: (%+4d)\r\n",data[0],data[1], data[2]);
+			int adj = CheckTiltDirection();
+			//pc.printf("x: (%+4d), y: (%+4d), z: (%+4d)\r\n",data[0],data[1], data[2]);
 			Hayato->AdjustVPosition(adj);
 		}
 
 		if(collision == true)
 		{
-			wait_ms(2000);
+			for (int i=0; i<5; i++)
+			{
+				lcdBacklit = 0;
+				wait_ms(200);
+				lcdBacklit = 1;
+				wait_ms(200);
+			}
 			break;
 		}
 	}
@@ -138,7 +137,7 @@ bool DrivingInGame::isCollision(void)
 	return collision;
 }
 
-void DrivingInGame::generateObstacle(void)
+void DrivingInGame::generateObstacle(float score)
 {
 	unsigned int hPosSum = 0;
 	int pVacuumRoadObjSlot = -1;
@@ -155,7 +154,7 @@ void DrivingInGame::generateObstacle(void)
 		}
 	}
 
-	if ((hPosSum < 12) && (pVacuumRoadObjSlot >= 0))
+	if ((hPosSum < 16 + (int)(score / 50000)) && (pVacuumRoadObjSlot >= 0))
 	{
 		//
 		// Magic number to start considering generating obstacle
@@ -163,7 +162,12 @@ void DrivingInGame::generateObstacle(void)
 		int r = rand();
 		if (r % 17 == 0)
 		{
+			if (r % 3 == 0)
 				pRoadObject[pVacuumRoadObjSlot] = new obstacle((r % 2)*2, gameTimer.read_ms());
+			else
+			{
+				pRoadObject[pVacuumRoadObjSlot] = new roadCar((r % 4), (2 % 2) + 1, gameTimer.read_ms());
+			}
 		}
 	}
 }

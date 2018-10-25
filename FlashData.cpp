@@ -8,7 +8,7 @@
 #include "IAP.h"
 #include "FlashData.hpp"
 
-extern Serial pc;
+//extern Serial pc;
 
 IAP     iap;
 
@@ -23,13 +23,13 @@ FlashData* FlashData::GetInstance(void)
 
 void FlashData::Init(void)
 {
-	pc.printf( "\r\n\r\n=== IAP: Flash memory commands ===\r\n" );
-	pc.printf(         "*** NXP Device-ID = 0x%08X ***\r\n\r\n", iap.read_ID() );
+	//pc.printf( "\r\n\r\n=== IAP: Flash memory commands ===\r\n" );
+	//pc.printf(         "*** NXP Device-ID = 0x%08X ***\r\n\r\n", iap.read_ID() );
 	DEVICE_ID sn = iap.read_serial();
-	pc.printf("Device SN: 0x%08X 0x%08X 0x%08X 0x%08X\r\n\r\n",sn.DIN_0, sn.DIN_1, sn.DIN_2, sn.DIN_3);
+	//pc.printf("Device SN: 0x%08X 0x%08X 0x%08X 0x%08X\r\n\r\n",sn.DIN_0, sn.DIN_1, sn.DIN_2, sn.DIN_3);
 }
 
-int FlashData::WriteAccelerometerOffsetCalData(sAccelerometerOffsetCalData* calData)
+int FlashData::WriteScoreBoardData(sScoreBoard* pSB)
 {
 	sFlashData sFlashDataForWrite = {};
 
@@ -45,7 +45,7 @@ int FlashData::WriteAccelerometerOffsetCalData(sAccelerometerOffsetCalData* calD
 	//
 	// Copy calData to FlashData Structure
 	//
-	memcpy(&(sFlashDataForWrite.acceCalData), (void *) calData, sizeof(sAccelerometerOffsetCalData));
+	memcpy(&(sFlashDataForWrite.scoreBoardData), (void *) pSB, sizeof(sScoreBoard));
 
 	//
 	// Write to Flash
@@ -53,13 +53,13 @@ int FlashData::WriteAccelerometerOffsetCalData(sAccelerometerOffsetCalData* calD
 	return writeData(&sFlashDataForWrite);
 }
 
-sAccelerometerOffsetCalData* FlashData::GetAccelerometerOffsetCalData(void)
+sScoreBoard* FlashData::GetScoreBoardData(void)
 {
-	sAccelerometerOffsetCalData* pCalData;
+	sScoreBoard* pCalData;
 
 	if ( isDataEmpty() == false ) {
 		pData = (sFlashData*) DATA_POINTER;
-		pCalData = &(pData->acceCalData);
+		pCalData = &(pData->scoreBoardData);
 	} else {
 		pData = 0;
 		pCalData = 0;
@@ -74,10 +74,10 @@ int FlashData::eraseData(void)
 	//
 	int rc = 0;
 	if ( isDataEmpty() == false ) {
-		pc.printf("TARGET SECTOR is NOT BLANK!  Erasing...\r\n");
+		//pc.printf("TARGET SECTOR is NOT BLANK!  Erasing...\r\n");
 		iap.prepare( TARGET_SECTOR, TARGET_SECTOR );	// Always must prepare sector before erasing or writing
 		rc   = iap.erase( TARGET_SECTOR, TARGET_SECTOR );
-		pc.printf( "erase result       = 0x%08X\r\n", rc );
+		//pc.printf( "erase result       = 0x%08X\r\n", rc );
 	}
 	return rc;
 }
@@ -103,11 +103,11 @@ int FlashData::writeData(sFlashData* pFlashData)
 	// copy RAM to Flash
 	iap.prepare( TARGET_SECTOR, TARGET_SECTOR );
 	int rc   = iap.write( mem, sector_start_adress[ TARGET_SECTOR ], MEM_SIZE );
-	pc.printf( "copied: SRAM(0x%08X)->Flash(0x%08X) for %d bytes. (result=0x%08X)\r\n", mem, sector_start_adress[ TARGET_SECTOR ], MEM_SIZE, rc );
+	//pc.printf( "copied: SRAM(0x%08X)->Flash(0x%08X) for %d bytes. (result=0x%08X)\r\n", mem, sector_start_adress[ TARGET_SECTOR ], MEM_SIZE, rc );
 
 	// compare
 	rc   = iap.compare( mem, sector_start_adress[ TARGET_SECTOR ], MEM_SIZE );
-	pc.printf( "compare result     = \"%s\"\r\n", rc ? "FAILED - Sector was probably not Blank before writing" : "OK" );
+	//pc.printf( "compare result     = \"%s\"\r\n", rc ? "FAILED - Sector was probably not Blank before writing" : "OK" );
 
 	return rc;
 }

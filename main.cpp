@@ -10,9 +10,9 @@
 #include "mbed.h"
 #include "TextLCD.h"
 #include "DrDriverGameMain.hpp"
-#include "halShockInterrupt.hpp"
 #include "halADXL345.hpp"
 #include "FlashData.hpp"
+#include "halAccelerometerCtrl.hpp"
 //
 // Below defines system HAL resources
 //
@@ -31,17 +31,8 @@
 //
 TextLCD lcd(p20, p19, p21, p22, p23, p24); // rs, e, d4-d7
 Timer gameTimer;
-Timer shockIntTimer;
 Serial pc(USBTX,USBRX);
-
-//
-// shock interrupt to use pull down mode 2
-//
-InterruptIn shockIntIn(p10);
-
-//DigitalIn steer(p26);
-
-
+DigitalOut lcdBacklit(p16);
 
 int main() 
 {
@@ -52,19 +43,15 @@ int main()
 	pc.printf("Dr. Driver!...\r\n\r\n");
 
 	ShockIntInit();
-
 	hal_ADXL345* acce = hal_ADXL345::GetInstance();
-
 	acce->Init();
-
-	pc.printf("\r\n\r\nADXL345 in operation...\r\n");
-
 	acce->SetSingleTapInterrupt(true, false);
+	lcdBacklit = 1;
 
 	DrDriverGameMain game;
+	game.Init();
 	while(1)
 	{
-		pc.printf("Let the game starting!\r\n");
 		game.MainStateMachine();
 	}
 }

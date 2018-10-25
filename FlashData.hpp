@@ -9,16 +9,16 @@
 #define FLASHDATA_HPP_
 
 #include "IAP.h"
-#include "halADXL345.hpp"
+#include "ScoreBoard.hpp"
 
 class FlashData {
 public:
-	~FlashData() {}
+	~FlashData() {delete pInst; pInst = 0;}
 
 	void Init(void);
 
-	int WriteAccelerometerOffsetCalData(sAccelerometerOffsetCalData* calData);
-	sAccelerometerOffsetCalData* GetAccelerometerOffsetCalData(void);
+	int WriteScoreBoardData(sScoreBoard* pSB);
+	sScoreBoard* GetScoreBoardData(void);
 
 	static FlashData* GetInstance(void);
 	static FlashData* pInst;
@@ -26,7 +26,7 @@ public:
 private:
 	typedef struct
 	{
-		sAccelerometerOffsetCalData acceCalData;
+		sScoreBoard scoreBoardData;
 	} sFlashData;
 
     static const int MEM_SIZE = 256;		// memory buffer size must be either 256, 512, 1024 or 4096 when copying to flash
