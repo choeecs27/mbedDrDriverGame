@@ -5,37 +5,35 @@
  *      Author: choeecs27
  */
 
+#include "halAccelerometerCtrl.hpp"
+
 #include "mbed.h"
-#include "halShockInterrupt.hpp"
 #include "halADXL345.hpp"
 
-extern Timer shockIntTimer;
-extern InterruptIn shockIntIn;
+
+Timer shockIntTimer;
 
 //
-// For debug. remove when done
+// shock interrupt to use pull down mode 2
 //
-extern Serial pc;
+InterruptIn shockIntIn(p10);
 
 bool TapOccurred;
-unsigned int TapOccurTime;
 
 void ISRShockIntIn(void)
 {
-	unsigned int curTapOccurTime = shockIntTimer.read_ms();
+	//unsigned int curTapOccurTime = shockIntTimer.read_ms();
 
-	if (curTapOccurTime > 100)
-	{
-		pc.printf("ISR - Tap occurred!\r\n");
-		TapOccurTime = curTapOccurTime;
+	//if (curTapOccurTime > 100)
+	//{
+	//	TapOccurTime = curTapOccurTime;
 		shockIntTimer.reset();
 		TapOccurred = true;
-	}
+	//}
 
 	wait_ms(50);
 	hal_ADXL345 *acce = hal_ADXL345::GetInstance();
 	unsigned char intSource = acce->GetInterruptSource();
-	pc.printf("ISR - serviced! Int src: 0x%02x\r\n", intSource);
 	int16_t data[3];
 	acce->ReadXYZ(data);
 }
@@ -53,7 +51,7 @@ bool CheckTapOccurred(void)
 {
 	if (TapOccurred == true)
 	{
-		if (shockIntTimer.read_ms() > 100)
+		if (shockIntTimer.read_ms() > 150)
 		{
 			//
 			// If Tap is consumed 100 ms after the event, discard the event
@@ -62,4 +60,18 @@ bool CheckTapOccurred(void)
 		}
 	}
 	return TapOccurred;
+}
+
+int CheckTiltDirection(void)
+{
+	const int defaultYPos = 128;
+
+	int16_t data[3];
+	hal_ADXL345::GetInstance()->ReadXYZ(data);
+	int adj = 0;
+	if (data[1] > 50+defaultYPos)
+		adj = 1;
+	else if (data[1] < -50+defaultYPos)
+		adj = -1;
+	return adj;
 }

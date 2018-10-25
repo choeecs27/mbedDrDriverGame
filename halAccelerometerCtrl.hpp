@@ -5,11 +5,12 @@
  *      Author: choeecs27
  */
 
-#ifndef HALSHOCKINTERRUPT_HPP_
-#define HALSHOCKINTERRUPT_HPP_
+#ifndef HALACCELEROMETERCTRL_HPP_
+#define HALACCELEROMETERCTRL_HPP_
 
 void ISRShockIntIn(void);
 bool CheckTapOccurred(void);
 void ShockIntInit(void);
+int CheckTiltDirection(void);
 
-#endif /* HALSHOCKINTERRUPT_HPP_ */
+#endif /* HALACCELEROMETERCTRL_HPP_ */
